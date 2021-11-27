@@ -1,0 +1,16 @@
+#!/usr/bin/env php
+<?php
+
+require __DIR__.'/../vendor/autoload.php';
+
+use ostark\PackageLister\ShowCommand;
+use Symfony\Component\Console\Application;
+
+$application = new Application();
+
+$application->setName('Package Lister');
+$application->setVersion('0.1');
+$application->add(new ShowCommand());
+
+
+$application->run();

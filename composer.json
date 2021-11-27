@@ -1,0 +1,21 @@
+{
+    "name": "ostark/cli-demo",
+    "description": "Composer package analyser",
+    "type": "project",
+    "bin": ["bin/project-a-bin"],
+
+    "autoload": {
+        "psr-4": {
+            "ostark\\PackageLister\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Oliver Stark",
+            "email": "os@fortrabbit.com"
+        }
+    ],
+    "require": {
+        "symfony/console": "^5.3"
+    }
+}
