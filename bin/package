@@ -3,7 +3,9 @@
 
 require __DIR__.'/../vendor/autoload.php';
 
-use ostark\PackageLister\ShowCommand;
+use ostark\PackageLister\Commands\ShowCommand;
+use ostark\PackageLister\Commands\GenerateCommand;
+
 use Symfony\Component\Console\Application;
 
 $application = new Application();
@@ -11,6 +13,7 @@ $application = new Application();
 $application->setName('Package Lister');
 $application->setVersion('0.1');
 $application->add(new ShowCommand());
+$application->add(new GenerateCommand());
 
-
+$application->setDefaultCommand(ShowCommand::getDefaultName());
 $application->run();

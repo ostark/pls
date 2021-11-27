@@ -16,6 +16,12 @@
         }
     ],
     "require": {
-        "symfony/console": "^5.3"
+        "symfony/console": "^5.3",
+        "spatie/packagist-api": "^2.0",
+        "illuminate/collections": "^8.73",
+        "rappasoft/laravel-helpers": "^2.0"
+    },
+    "require-dev": {
+        "symfony/var-dumper": "^5.3"
     }
 }

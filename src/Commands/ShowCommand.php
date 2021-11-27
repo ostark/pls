@@ -1,6 +1,6 @@
 <?php
 
-namespace ostark\PackageLister;
+namespace ostark\PackageLister\Commands;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -12,11 +12,12 @@ class ShowCommand extends Command
 
     protected function configure(): void
     {
-        // ...
+        $this->setDescription('Show packages');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+
         $output->writeln('HERE');
 
         return Command::SUCCESS;
