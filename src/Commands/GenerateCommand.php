@@ -2,14 +2,24 @@
 
 namespace ostark\PackageLister\Commands;
 
+use ostark\PackageLister\Package\Collection;
 use ostark\PackageLister\Package\PluginPackage;
+use ostark\PackageLister\Client;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class GenerateCommand extends Command
 {
     protected static $defaultName = 'generate';
+    protected  Client $client;
+
+    public function __construct(Client $client)
+    {
+        $this->client = $client;
+        parent::__construct();
+    }
 
     protected function configure(): void
     {
@@ -20,58 +30,39 @@ class GenerateCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $collection = new Collection();
 
-        $client = new \GuzzleHttp\Client();
-        $generator = new \Spatie\Packagist\PackagistUrlGenerator();
-        $packagist = new \Spatie\Packagist\PackagistClient($client, $generator);
+        // List packages by type
+        $list = $this->client->getPackagesNamesByType(Client::TYPE_CRAFT);
+        $count = count($list['packageNames']);
 
-        // List packages by type.
-        $list = $packagist->getPackagesNamesByType('craft-plugin');
-        $collection = collect();
+        if ($list && $count > 0) {
 
-
-
-        if ($list && count($list['packageNames'])) {
+            ProgressBar::setFormatDefinition('minimal', 'Progress: %percent%%');
+            $progressBar = new ProgressBar($output, $count);
+            $progressBar->setFormat('minimal');
+            $progressBar->start();
 
             foreach ($list['packageNames'] as $name) {
 
-                $single = $packagist->getPackage($name);
+                $single = $this->client->getPackage($name);
 
-                $versions = array_get($single, 'package.versions');
-                $first = current($versions);
-                $devPacks = implode('+', array_keys(array_get($first, 'require-dev', [])));
-
-                if (array_get($single, 'package.abandoned')) {
+                if ($single['package']['abandoned'] ?? false) {
+                    $progressBar->advance();
                     continue;
                 }
 
-                if ($name === 'adigital/x-clacks-overhead') {
-                    break;
+                if ($package = PluginPackage::createFromApiResponse($single['package'])) {
+                    $collection->add($package);
+                    $progressBar->advance();
                 }
-
-                $collection->add(
-                    new PluginPackage(
-                        array_get($single, 'package.name'),
-                        array_get($single, 'package.description'),
-                        array_get($first, 'extra.handle'),
-                        array_get($single, 'package.repository'),
-                        $devPacks,
-                        array_get($single, 'package.downloads.monthly'),
-                        array_get($single, 'package.dependents'),
-                        array_get($single, 'package.favers'),
-                        new \DateTime($first['time'])
-                    )
-                );
             }
 
+            $progressBar->finish();
         }
 
-        dd($collection->toJson());
-
-
+        file_put_contents('temp.json', $collection->toJson());
         $output->writeln('HERE');
-
         return Command::SUCCESS;
-
     }
 }
