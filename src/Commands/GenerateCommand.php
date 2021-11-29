@@ -2,7 +2,8 @@
 
 namespace ostark\PackageLister\Commands;
 
-use ostark\PackageLister\Package\Collection;
+use Illuminate\Support\Collection;
+use ostark\PackageLister\FileHelper;
 use ostark\PackageLister\Package\PluginPackage;
 use ostark\PackageLister\Client;
 use Symfony\Component\Console\Command\Command;
@@ -61,7 +62,7 @@ class GenerateCommand extends Command
             $progressBar->finish();
         }
 
-        file_put_contents('temp.json', $collection->toJson());
+        (new FileHelper(getcwd()))->writeJson(TEMP_JSON, $collection);
         $output->writeln('HERE');
         return Command::SUCCESS;
     }

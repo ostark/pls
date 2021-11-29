@@ -3,6 +3,7 @@
 namespace ostark\PackageLister\Commands;
 
 use Illuminate\Support\Collection;
+use ostark\PackageLister\FileHelper;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
@@ -13,11 +14,12 @@ class ShowCommand extends Command
 {
     protected static $defaultName = 'show';
 
+
     protected function configure(): void
     {
         $this
             ->setDescription('Show packages')
-            ->addOption('field', null, InputOption::VALUE_OPTIONAL, 'Sort by this field', 'monthlyDownloads')
+            ->addOption('field', null, InputOption::VALUE_OPTIONAL, 'Sort table by this field', 'monthlyDownloads')
             ->addOption('direction')
             ->addOption('limit', null, InputOption::VALUE_OPTIONAL, 'Max items', 20)
             ->addOption('output', null, InputOption::VALUE_OPTIONAL);
@@ -25,14 +27,18 @@ class ShowCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $io = new FileHelper(getcwd());
         $field = $input->getOption('field');
         $limit = $input->getOption('limit');
         $outputFile = $input->getOption('output');
 
-        $collection = $this->readPackages();
+        if (!$collection = $io->readJson(TEMP_JSON)) {
+            $output->writeln("Dataset not found, use the 'generate' command first");
+            return Command::FAILURE;
+        }
 
         if ($outputFile) {
-            $this->writeToFile($collection, $outputFile);
+            $io->writeJson($outputFile, $collection);
             return Command::SUCCESS;
         }
 
@@ -41,37 +47,18 @@ class ShowCommand extends Command
         }, SORT_REGULAR, true)->take($limit);
 
         $this->renderTable($sorted, $output);
+        $output->writeln('Datasource from: ' . $io->getFileDate(TEMP_JSON)->format('Y-m-d H:i:s'));
 
         return Command::SUCCESS;
-    }
-
-    /**
-     * @param string $file
-     *
-     * @return \Illuminate\Support\Collection
-     */
-    private function readPackages($file = 'temp.json'): \Illuminate\Support\Collection
-    {
-        $collection = collect();
-        $json = json_decode(file_get_contents('temp.json'));
-        foreach ($json as $package) {
-            $collection->add($package);
-        }
-        return $collection;
-    }
-
-    private function writeToFile(\Illuminate\Support\Collection $collection, string $file)
-    {
-        file_put_contents($file, $collection->toJson());
     }
 
     private function renderTable(Collection $collection, OutputInterface $output)
     {
         $table = new Table($output);
-        $table->setHeaders(['name','downloads']);
+        $table->setHeaders(['name','downloads','dependents']);
 
         foreach ($collection as $package) {
-            $table->addRow([$package->name, $package->monthlyDownloads]);
+            $table->addRow([$package->name, $package->monthlyDownloads, $package->dependents]);
         }
 
         $table->render();
