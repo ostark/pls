@@ -59,8 +59,12 @@ class ShowCommand extends Command
         $table->setHeaders(['name','downloads','dependents', 'updated_at']);
 
         foreach ($collection as $package) {
-            /* @var PluginPackage $package */
-            $table->addRow([$package->name, $package->monthlyDownloads, $package->dependents, $package->updated]);
+            $table->addRow([
+                $package->name,
+                $package->monthlyDownloads,
+                $package->dependents,
+                $package->updated->format('Y-m-d')
+            ]);
         }
 
         $table->render();
