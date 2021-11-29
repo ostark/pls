@@ -4,6 +4,7 @@ namespace ostark\PackageLister\Commands;
 
 use Illuminate\Support\Collection;
 use ostark\PackageLister\FileHelper;
+use ostark\PackageLister\Package\PluginPackage;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
@@ -42,7 +43,7 @@ class ShowCommand extends Command
             return Command::SUCCESS;
         }
 
-        $sorted = $collection->sortBy(function ($package, $key) use ($field) {
+        $sorted = $collection->sortBy(function (PluginPackage$package, $key) use ($field) {
             return $package->$field;
         }, SORT_REGULAR, true)->take($limit);
 
@@ -55,10 +56,11 @@ class ShowCommand extends Command
     private function renderTable(Collection $collection, OutputInterface $output)
     {
         $table = new Table($output);
-        $table->setHeaders(['name','downloads','dependents']);
+        $table->setHeaders(['name','downloads','dependents', 'updated_at']);
 
         foreach ($collection as $package) {
-            $table->addRow([$package->name, $package->monthlyDownloads, $package->dependents]);
+            /* @var PluginPackage $package */
+            $table->addRow([$package->name, $package->monthlyDownloads, $package->dependents, $package->updated]);
         }
 
         $table->render();
