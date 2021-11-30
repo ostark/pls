@@ -2,16 +2,19 @@
 
 namespace ostark\PackageLister;
 
-use \Spatie\Packagist\PackagistClient as SpatieClient;
+use GuzzleHttp\RequestOptions;
+use Spatie\Packagist\PackagistClient as SpatieClient;
+use Spatie\Packagist\PackagistUrlGenerator;
 
 class Client extends SpatieClient
 {
     public const TYPE_CRAFT = 'craft-plugin';
 
-    static function make(): static
+    static function make($userAgent = 'PackageLister'): static
     {
-        $client = new \GuzzleHttp\Client();
-        $generator = new \Spatie\Packagist\PackagistUrlGenerator();
+        $headers = ['User-Agent' => $userAgent];
+        $client = new \GuzzleHttp\Client([RequestOptions::HEADERS => $headers]);
+        $generator = new PackagistUrlGenerator();
 
         return new static($client, $generator);
     }

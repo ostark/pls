@@ -3,6 +3,7 @@
 namespace ostark\PackageLister;
 
 use Illuminate\Support\Collection;
+use ostark\PackageLister\Package\PackageCollection;
 
 class FileHelper
 {
@@ -14,19 +15,19 @@ class FileHelper
         $this->basePath = $basePath;
     }
 
-    public function writeJson(string $file, Collection $collection): void
+    public function writeJson(string $file, PackageCollection $collection): void
     {
         $file = $this->normalizePath($file);
         file_put_contents($file, $collection->toJson()) === false;
     }
 
-    public function readJson(string $file): ?Collection
+    public function readJson(string $file): ?PackageCollection
     {
         if (!file_exists($this->normalizePath($file))) {
             return null;
         }
 
-        $collection = collect();
+        $collection = new PackageCollection();
         $json = json_decode(file_get_contents($this->normalizePath($file)));
 
         foreach ($json as $package) {

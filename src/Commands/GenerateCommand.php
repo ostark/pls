@@ -2,8 +2,8 @@
 
 namespace ostark\PackageLister\Commands;
 
-use Illuminate\Support\Collection;
 use ostark\PackageLister\FileHelper;
+use ostark\PackageLister\Package\PackageCollection;
 use ostark\PackageLister\Package\PluginPackage;
 use ostark\PackageLister\Client;
 use Symfony\Component\Console\Command\Command;
@@ -31,7 +31,7 @@ class GenerateCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $collection = new Collection();
+        $collection = new PackageCollection();
 
         // List packages by type
         $list = $this->client->getPackagesNamesByType(Client::TYPE_CRAFT);
@@ -63,7 +63,7 @@ class GenerateCommand extends Command
         }
 
         (new FileHelper(getcwd()))->writeJson(TEMP_JSON, $collection);
-        $output->writeln('HERE');
+
         return Command::SUCCESS;
     }
 }

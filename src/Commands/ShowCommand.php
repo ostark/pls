@@ -2,8 +2,9 @@
 
 namespace ostark\PackageLister\Commands;
 
-use Illuminate\Support\Collection;
 use ostark\PackageLister\FileHelper;
+use ostark\PackageLister\Package\PackageCollection;
+use ostark\PackageLister\Package\PluginPackage;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
@@ -19,7 +20,7 @@ class ShowCommand extends Command
     {
         $this
             ->setDescription('Show packages')
-            ->addOption('field', null, InputOption::VALUE_OPTIONAL, 'Sort table by this field', 'monthlyDownloads')
+            ->addOption('sortBy', null, InputOption::VALUE_OPTIONAL, 'Sort table by this field', 'downloads')
             ->addOption('direction')
             ->addOption('limit', null, InputOption::VALUE_OPTIONAL, 'Max items', 20)
             ->addOption('output', null, InputOption::VALUE_OPTIONAL);
@@ -27,18 +28,26 @@ class ShowCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $io = new FileHelper(getcwd());
-        $field = $input->getOption('field');
+        $file = new FileHelper(getcwd());
+        $field = $input->getOption('sortBy');
         $limit = $input->getOption('limit');
         $outputFile = $input->getOption('output');
 
-        if (!$collection = $io->readJson(TEMP_JSON)) {
+        if (!in_array($field, PluginPackage::SORT_OPTIONS)) {
+            $output->writeln(sprintf(
+                "Unsupported option for --sortBy, valid options are: %s",
+                implode(', ', PluginPackage::SORT_OPTIONS)
+            ));
+            return Command::FAILURE;
+        }
+
+        if (!$collection = $file->readJson(TEMP_JSON)) {
             $output->writeln("Dataset not found, use the 'generate' command first");
             return Command::FAILURE;
         }
 
         if ($outputFile) {
-            $io->writeJson($outputFile, $collection);
+            $file->writeJson($outputFile, $collection);
             return Command::SUCCESS;
         }
 
@@ -47,21 +56,24 @@ class ShowCommand extends Command
         }, SORT_REGULAR, true)->take($limit);
 
         $this->renderTable($sorted, $output);
-        $output->writeln('Datasource from: ' . $io->getFileDate(TEMP_JSON)->format('Y-m-d H:i:s'));
+        $output->writeln('Datasource from: ' . $file->getFileDate(TEMP_JSON)->format('Y-m-d H:i:s'));
+        $output->writeln('Sorted by: ' . $field);
 
         return Command::SUCCESS;
     }
 
-    private function renderTable(Collection $collection, OutputInterface $output)
+    private function renderTable(PackageCollection $collection, OutputInterface $output)
     {
         $table = new Table($output);
-        $table->setHeaders(['name','downloads','dependents', 'updated']);
+        $table->setHeaders(['name','version', 'downloads','dependents', 'test lib', 'updated']);
 
         foreach ($collection as $package) {
             $table->addRow([
                 $package->name,
-                $package->monthlyDownloads,
+                $package->version,
+                $package->downloads,
                 $package->dependents,
+                $package->testLibrary ?? '-',
                 $package->updated
             ]);
         }

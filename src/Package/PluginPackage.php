@@ -4,11 +4,15 @@ namespace ostark\PackageLister\Package;
 
 class PluginPackage implements \JsonSerializable
 {
+    public const SORT_OPTIONS = ['dependents', 'favers', 'downloads', 'testLibrary', 'updated'];
+
+
     public int $dependents;
     public ?string $description;
     public int $favers;
     public string $handle;
-    public int $monthlyDownloads;
+    public string $version;
+    public int $downloads;
     public string $name;
     public string $repository;
     public ?string $testLibrary;
@@ -29,13 +33,15 @@ class PluginPackage implements \JsonSerializable
         }
 
        return new static([
+
                 'name' =>  array_get($package, 'name'),
                 'description' => array_get($package, 'description'),
                 'repository' => array_get($package, 'repository'),
-                'monthlyDownloads' => array_get($package, 'downloads.monthly'),
+                'downloads' => array_get($package, 'downloads.monthly'),
                 'dependents' => array_get($package, 'dependents'),
                 'favers' => array_get($package, 'favers'),
                 'handle' => array_get($first, 'extra.handle'),
+                'version' =>  array_get($first, 'version'),
                 'testLibrary' => (new Dependencies(array_get($first, 'require-dev', [])))->getTestPackage(),
                 'updated' =>  new \DateTime($first['time']),
             ]
