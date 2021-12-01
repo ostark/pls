@@ -20,4 +20,9 @@ class PackageCollection extends Collection
     {
         return parent::offsetGet($key);
     }
+
+    public function get($key, $default = null): PluginPackage
+    {
+        return parent::get($key, $default);
+    }
 }
