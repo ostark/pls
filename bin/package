@@ -9,14 +9,15 @@ use ostark\PackageLister\Commands\GenerateCommand;
 use ostark\PackageLister\Client;
 use Symfony\Component\Console\Application;
 
-define('TEMP_JSON', sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'package-lister.json');
+$tempJsonPath = getenv('TEMP_JSON_PATH') ?: sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'package-lister.json';
+$userAgent = getenv('USER_AGENT') ?: "PackageLister Homework @fortrabbit";
 
 $application = new Application();
 
 $application->setName('Package Lister');
-$application->setVersion('0.1');
-$application->add(new ShowCommand());
-$application->add(new GenerateCommand(Client::make()));
+$application->setVersion('1.0');
+$application->add(new ShowCommand($tempJsonPath));
+$application->add(new GenerateCommand(Client::make($userAgent), $tempJsonPath));
 
 $application->setDefaultCommand(ShowCommand::getDefaultName());
 $application->run();

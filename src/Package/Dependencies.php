@@ -4,7 +4,7 @@ namespace ostark\PackageLister\Package;
 
 class Dependencies
 {
-    const TEST_LIBS = [
+    protected const TEST_LIBS = [
         'codeception/codeception',
         'pestphp/pest',
         'phpunit/phpunit',
@@ -22,7 +22,7 @@ class Dependencies
 
     public function getTestPackage(): ?string
     {
-        // Pick the first if any
+        // Pick the first
         foreach ($this->dependencies as $package) {
             if (in_array($package, self::TEST_LIBS)) {
                 return $package;

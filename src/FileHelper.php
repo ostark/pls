@@ -2,12 +2,10 @@
 
 namespace ostark\PackageLister;
 
-use Illuminate\Support\Collection;
 use ostark\PackageLister\Package\PackageCollection;
 
 class FileHelper
 {
-
     protected string $basePath;
 
     public function __construct(string $basePath)

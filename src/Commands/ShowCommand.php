@@ -14,7 +14,13 @@ use Symfony\Component\Console\Output\OutputInterface;
 class ShowCommand extends Command
 {
     protected static $defaultName = 'show';
+    protected string $tempJsonPath;
 
+    public function __construct(string $tempJsonPath)
+    {
+        $this->tempJsonPath = $tempJsonPath;
+        parent::__construct();
+    }
 
     protected function configure(): void
     {
@@ -41,7 +47,7 @@ class ShowCommand extends Command
             return Command::FAILURE;
         }
 
-        if (!$collection = $file->readJson(TEMP_JSON)) {
+        if (!$collection = $file->readJson($this->tempJsonPath)) {
             $output->writeln("Dataset not found, use the 'generate' command first");
             return Command::FAILURE;
         }
@@ -56,7 +62,7 @@ class ShowCommand extends Command
         }, SORT_REGULAR, true)->take($limit);
 
         $this->renderTable($sorted, $output);
-        $output->writeln('Datasource from: ' . $file->getFileDate(TEMP_JSON)->format('Y-m-d H:i:s'));
+        $output->writeln('Datasource from: ' . $file->getFileDate($this->tempJsonPath)->format('Y-m-d H:i:s'));
         $output->writeln('Sorted by: ' . $field);
 
         return Command::SUCCESS;
@@ -65,7 +71,7 @@ class ShowCommand extends Command
     private function renderTable(PackageCollection $collection, OutputInterface $output)
     {
         $table = new Table($output);
-        $table->setHeaders(['name','version', 'downloads','dependents', 'test lib', 'updated']);
+        $table->setHeaders(['name', 'version', 'downloads', 'dependents', 'test lib', 'updated']);
 
         foreach ($collection as $package) {
             $table->addRow([

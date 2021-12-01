@@ -14,13 +14,17 @@ use Symfony\Component\Console\Output\OutputInterface;
 class GenerateCommand extends Command
 {
     protected static $defaultName = 'generate';
-    protected  Client $client;
+    protected Client $client;
+    protected string $tempJsonPath;
 
-    public function __construct(Client $client)
+    public function __construct(Client $client, string $tempJsonPath)
     {
         $this->client = $client;
+        $this->tempJsonPath = $tempJsonPath;
+
         parent::__construct();
     }
+
 
     protected function configure(): void
     {
@@ -62,7 +66,7 @@ class GenerateCommand extends Command
             $progressBar->finish();
         }
 
-        (new FileHelper(getcwd()))->writeJson(TEMP_JSON, $collection);
+        (new FileHelper(getcwd()))->writeJson($this->tempJsonPath, $collection);
 
         return Command::SUCCESS;
     }
