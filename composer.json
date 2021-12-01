@@ -22,6 +22,10 @@
         "rappasoft/laravel-helpers": "^2.0"
     },
     "require-dev": {
-        "symfony/var-dumper": "^5.3"
+        "symfony/var-dumper": "^5.3",
+        "pestphp/pest": "^1.21"
+    },
+    "scripts": {
+        "test": "vendor/bin/pest"
     }
 }

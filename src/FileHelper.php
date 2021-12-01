@@ -55,6 +55,7 @@ class FileHelper
 
     private function normalizePath($file): string
     {
-        return $this->isAbsolutePath($file) ? $file : $this->basePath . DIRECTORY_SEPARATOR . $file;
+        $path = rtrim($this->basePath, DIRECTORY_SEPARATOR);
+        return $this->isAbsolutePath($file) ? $file : $path . DIRECTORY_SEPARATOR . $file;
     }
 }
