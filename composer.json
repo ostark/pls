@@ -2,7 +2,7 @@
     "name": "ostark/cli-demo",
     "description": "Composer package analyser",
     "type": "project",
-    "bin": ["bin/project-a-bin"],
+    "bin": ["bin/pluginlist"],
 
     "autoload": {
         "psr-4": {
