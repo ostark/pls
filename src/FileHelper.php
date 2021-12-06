@@ -2,6 +2,7 @@
 
 namespace ostark\PackageLister;
 
+use DateTime;
 use ostark\PackageLister\Package\PackageCollection;
 
 class FileHelper
@@ -35,14 +36,14 @@ class FileHelper
         return $collection;
     }
 
-    public function getFileDate(string $file): ?\DateTime
+    public function getFileDate(string $file): ?DateTime
     {
         $file = $this->normalizePath($file);
         if (!file_exists($file)) {
             return null;
         }
 
-        $dt = new \DateTime();
+        $dt = new DateTime();
         $dt->setTimestamp(filemtime($file));
 
         return $dt;

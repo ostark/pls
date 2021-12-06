@@ -30,6 +30,6 @@
     },
     "scripts": {
         "test": "vendor/bin/pest",
-        "phpstan": "vendor/bin/phpstan analyse src --level=5"
+        "phpstan": "vendor/bin/phpstan analyse src --level=6"
     }
 }
