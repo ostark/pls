@@ -25,4 +25,12 @@ class PackageCollection extends Collection
     {
         return parent::get($key, $default);
     }
+
+    public function sortByField(string $field, $descending = true): static
+    {
+        return $this->sortBy(function ($package, $key) use ($field) {
+            return $package->$field;
+        }, SORT_REGULAR, $descending);
+    }
+
 }

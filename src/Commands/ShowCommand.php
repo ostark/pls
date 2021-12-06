@@ -14,11 +14,14 @@ use Symfony\Component\Console\Output\OutputInterface;
 class ShowCommand extends Command
 {
     protected static $defaultName = 'show';
-    protected string $tempJsonPath;
+    protected string $pathToDataset;
+    protected FileHelper $fileHelper;
 
-    public function __construct(string $tempJsonPath)
+    public function __construct(string $pathToDataset, FileHelper $fileHelper = null)
     {
-        $this->tempJsonPath = $tempJsonPath;
+        $this->pathToDataset = $pathToDataset;
+        $this->fileHelper = $fileHelper ?: new FileHelper(getcwd());
+
         parent::__construct();
     }
 
@@ -27,48 +30,52 @@ class ShowCommand extends Command
         $this
             ->setDescription('Show packages')
             ->addOption('sortBy', null, InputOption::VALUE_OPTIONAL, 'Sort table by this field', 'downloads')
-            ->addOption('direction')
+            ->addOption('sort', null, InputOption::VALUE_OPTIONAL, 'Sort order (ASC or DESC)', 'DESC')
             ->addOption('limit', null, InputOption::VALUE_OPTIONAL, 'Max items', 20)
-            ->addOption('output', null, InputOption::VALUE_OPTIONAL);
+            ->addOption('output', 'o', InputOption::VALUE_OPTIONAL);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $file = new FileHelper(getcwd());
         $field = $input->getOption('sortBy');
         $limit = $input->getOption('limit');
+        $descending = strtoupper($input->getOption('sort')) === 'DESC';
         $outputFile = $input->getOption('output');
 
-        if (!in_array($field, PluginPackage::SORT_OPTIONS)) {
-            $output->writeln(sprintf(
-                "Unsupported option for --sortBy, valid options are: %s",
-                implode(', ', PluginPackage::SORT_OPTIONS)
-            ));
-            return Command::FAILURE;
-        }
-
-        if (!$collection = $file->readJson($this->tempJsonPath)) {
+        if (!$collection = $this->fileHelper->readJson($this->pathToDataset)) {
             $output->writeln("Dataset not found, use the 'generate' command first");
             return Command::FAILURE;
         }
 
         if ($outputFile) {
-            $file->writeJson($outputFile, $collection);
+            $this->fileHelper->writeJson($outputFile, $collection);
             return Command::SUCCESS;
         }
 
-        $sorted = $collection->sortBy(function ($package, $key) use ($field) {
-            return $package->$field;
-        }, SORT_REGULAR, true)->take($limit);
-
-        $this->renderTable($sorted, $output);
-        $output->writeln('Datasource from: ' . $file->getFileDate($this->tempJsonPath)->format('Y-m-d H:i:s'));
-        $output->writeln('Sorted by: ' . $field);
+        $sorted = $collection->sortByField($field, $descending)->take($limit);
+        $this->renderTable($sorted, $output, $field);
 
         return Command::SUCCESS;
     }
 
-    private function renderTable(PackageCollection $collection, OutputInterface $output)
+    protected function initialize(InputInterface $input, OutputInterface $output)
+    {
+        parent::initialize($input, $output);
+
+        $field = $input->getOption('sortBy');
+
+        // Validate sortBy input
+        if (!in_array($field, PluginPackage::SORT_OPTIONS)) {
+            $output->writeln(sprintf(
+                "Unsupported option for --sortBy, valid options are: %s",
+                implode(', ', PluginPackage::SORT_OPTIONS)
+            ));
+            $this->setCode(fn() => Command::FAILURE);
+        }
+
+    }
+
+    private function renderTable(PackageCollection $collection, OutputInterface $output, string $sortBy)
     {
         $table = new Table($output);
         $table->setHeaders(['name', 'version', 'downloads', 'dependents', 'test lib', 'updated']);
@@ -85,5 +92,8 @@ class ShowCommand extends Command
         }
 
         $table->render();
+
+        $output->writeln('Datasource from: ' . $this->fileHelper->getFileDate($this->pathToDataset)->format('Y-m-d H:i:s'));
+        $output->writeln('Sorted by: ' . $sortBy);
     }
 }
