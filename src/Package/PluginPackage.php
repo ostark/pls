@@ -6,16 +6,16 @@ final class PluginPackage implements \JsonSerializable
 {
     public const SORT_OPTIONS = ['dependents', 'favers', 'downloads', 'testLibrary', 'updated'];
 
-    public int $dependents;
+    public string $name;
+    public string $handle;
     public ?string $description;
+    public string $version;
+    public ?string $testLibrary;
+    public int $dependents;
     public int $downloads;
     public int $favers;
-    public string $handle;
-    public string $name;
     public string $repository;
-    public ?string $testLibrary;
     public \DateTime $updated;
-    public string $version;
 
     public function __construct(array $args = [])
     {
@@ -46,6 +46,14 @@ final class PluginPackage implements \JsonSerializable
                 'updated' => new \DateTime($first['time']),
             ]
         );
+    }
+
+    public static function createFromJsonObject(object $package): ?static
+    {
+        $fields = (array) $package;
+        $fields['updated'] = \DateTime::createFromFormat('Y-m-d', $fields['updated']);
+
+        return new static($fields);
     }
 
     public function jsonSerialize(): array

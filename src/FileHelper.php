@@ -4,6 +4,7 @@ namespace ostark\PackageLister;
 
 use DateTime;
 use ostark\PackageLister\Package\PackageCollection;
+use ostark\PackageLister\Package\PluginPackage;
 
 class FileHelper
 {
@@ -30,7 +31,7 @@ class FileHelper
         $json = json_decode(file_get_contents($this->normalizePath($file)));
 
         foreach ($json as $package) {
-            $collection->add($package);
+            $collection->add(PluginPackage::createFromJsonObject($package));
         }
 
         return $collection;

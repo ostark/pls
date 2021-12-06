@@ -5,6 +5,7 @@ namespace ostark\PackageLister\Commands;
 use ostark\PackageLister\FileHelper;
 use ostark\PackageLister\Package\PackageCollection;
 use ostark\PackageLister\Package\PluginPackage;
+use ostark\PackageLister\Package\TableOutput;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
@@ -77,18 +78,12 @@ class ShowCommand extends Command
 
     private function renderTable(PackageCollection $collection, OutputInterface $output, string $sortBy): void
     {
+
         $table = new Table($output);
-        $table->setHeaders(['name', 'version', 'downloads', 'dependents', 'test lib', 'updated']);
+        $table->setHeaders(TableOutput::VISIBLE_FIELDS);
 
         foreach ($collection as $package) {
-            $table->addRow([
-                $package->name,
-                $package->version,
-                $package->downloads,
-                $package->dependents,
-                $package->testLibrary ?? '-',
-                $package->updated
-            ]);
+            $table->addRow((new TableOutput($package))->getRow());
         }
 
         $table->render();
