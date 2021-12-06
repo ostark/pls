@@ -48,12 +48,12 @@ class FileHelper
         return $dt;
     }
 
-    private function isAbsolutePath($file): bool
+    private function isAbsolutePath(string $file): bool
     {
         return str_starts_with($file, DIRECTORY_SEPARATOR);
     }
 
-    private function normalizePath($file): string
+    private function normalizePath(string $file): string
     {
         $path = rtrim($this->basePath, DIRECTORY_SEPARATOR);
         return $this->isAbsolutePath($file) ? $file : $path . DIRECTORY_SEPARATOR . $file;

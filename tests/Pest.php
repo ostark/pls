@@ -23,7 +23,7 @@ function dummyCollection($items = 1): PackageCollection
             'handle' => "dummy-$i",
             'version' => "dev-dummy-$i",
             'testLibrary' => null,
-            'updated' => new \DateTime(1609462800),
+            'updated' => (new DateTime())->setTimestamp(1609462800),
         ]));
     }
 

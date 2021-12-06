@@ -25,9 +25,11 @@
     },
     "require-dev": {
         "symfony/var-dumper": "^5.3",
-        "pestphp/pest": "^1.21"
+        "pestphp/pest": "^1.21",
+        "phpstan/phpstan": "^1.2"
     },
     "scripts": {
-        "test": "vendor/bin/pest"
+        "test": "vendor/bin/pest",
+        "phpstan": "vendor/bin/phpstan analyse src --level=5"
     }
 }

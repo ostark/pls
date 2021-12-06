@@ -58,7 +58,7 @@ class ShowCommand extends Command
         return Command::SUCCESS;
     }
 
-    protected function initialize(InputInterface $input, OutputInterface $output)
+    protected function initialize(InputInterface $input, OutputInterface $output): void
     {
         parent::initialize($input, $output);
 
@@ -75,7 +75,7 @@ class ShowCommand extends Command
 
     }
 
-    private function renderTable(PackageCollection $collection, OutputInterface $output, string $sortBy)
+    private function renderTable(PackageCollection $collection, OutputInterface $output, string $sortBy): void
     {
         $table = new Table($output);
         $table->setHeaders(['name', 'version', 'downloads', 'dependents', 'test lib', 'updated']);

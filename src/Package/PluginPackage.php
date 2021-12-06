@@ -2,10 +2,9 @@
 
 namespace ostark\PackageLister\Package;
 
-class PluginPackage implements \JsonSerializable
+final class PluginPackage implements \JsonSerializable
 {
     public const SORT_OPTIONS = ['dependents', 'favers', 'downloads', 'testLibrary', 'updated'];
-
 
     public int $dependents;
     public ?string $description;
