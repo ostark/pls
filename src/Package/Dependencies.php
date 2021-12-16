@@ -4,7 +4,7 @@ namespace ostark\PackageLister\Package;
 
 class Dependencies
 {
-    protected const TEST_LIBS = [
+    public const TEST_LIBS = [
         'codeception/codeception',
         'pestphp/pest',
         'phpunit/phpunit',
