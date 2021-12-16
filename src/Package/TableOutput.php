@@ -24,6 +24,7 @@ class TableOutput
     public function getRow(): array
     {
         $row = [];
+        $this->format($this->package);
         $package = $this->package->jsonSerialize();
 
         foreach (self::VISIBLE_FIELDS as $field) {
@@ -31,5 +32,12 @@ class TableOutput
         }
 
         return $row;
+    }
+
+    private function format(PluginPackage $package) : void
+    {
+        // strip https:// and limit the length
+        $trimmed = substr($package->repository, 8, 50);
+        $package->repository = "<href={$package->repository}>{$trimmed}</>";
     }
 }
