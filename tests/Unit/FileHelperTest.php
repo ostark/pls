@@ -41,7 +41,7 @@ it('does not use base path if absolute path is given', function () {
     expect($absPath)->toBeFile();
 });
 
-it('fails returns null when reading non-existing file', function () {
+it('returns null when reading non-existing file', function () {
     $helper = new \ostark\PackageLister\FileHelper(DIRECTORY_SEPARATOR);
     $collection = $helper->readJson(validTestfilePath('some-file.json'));
     expect($collection)->toBeNull();
