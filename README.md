@@ -10,6 +10,8 @@ To increase UX when working with table output, a local copy of dataset is stored
 
 The packagist API suggests to send a `User-Agent` header to indentify the source of the requests. This header is set to `PackageLister Homework @fortrabbit`, with the `PLS_USER_AGENT` env var you can change the default.
 
+<img width="1129" alt="Bildschirmfoto 2021-12-16 um 16 02 20" src="https://user-images.githubusercontent.com/1941743/146395870-3f1efd11-424e-4475-b3c7-4d55235b03a7.png">
+
 
 ## Commands
 
