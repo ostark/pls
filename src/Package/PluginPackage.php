@@ -27,21 +27,21 @@ final class PluginPackage implements \JsonSerializable
         $versions = $package['versions'] ?? [];
         $first = current($versions);
 
-        if (!array_get($first, 'extra.handle')) {
+        if (is_null($first['extra']['handle'] ?? null)) {
             return null;
         }
 
-        $devDependencies = new Dependencies(array_get($first, 'require-dev', []));
+        $devDependencies = new Dependencies($first['require-dev'] ?? []);
 
         return new static([
-                'name' => array_get($package, 'name'),
-                'description' => array_get($package, 'description'),
-                'repository' => array_get($package, 'repository'),
-                'downloads' => array_get($package, 'downloads.monthly'),
-                'dependents' => array_get($package, 'dependents'),
-                'favers' => array_get($package, 'favers'),
-                'handle' => array_get($first, 'extra.handle'),
-                'version' => array_get($first, 'version'),
+                'name' =>$package['name'],
+                'description' => $package['description'] ?? null,
+                'repository' => $package['repository'],
+                'downloads' => $package['downloads']['monthly'] ?? 0,
+                'dependents' => $package['dependents'] ?? 0,
+                'favers' => $package['favers'] ?? 0,
+                'handle' => $first['extra']['handle'],
+                'version' => $first['version'],
                 'testLibrary' => $devDependencies->getTestPackage(),
                 'updated' => new \DateTime($first['time']),
             ]

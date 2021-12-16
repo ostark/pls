@@ -19,11 +19,12 @@ The packagist API suggests to send a `User-Agent` header to indentify the source
 ## Tests
 
 Some pest unit tests cover the implemented behaviour. 
-Clone it, run composer install and run the tests:
+Clone it, run composer install and run the tests and static analysis:
 
 ```
 composer install
 composer test
+composer phpstan
 ```
 
 # Bonus 
