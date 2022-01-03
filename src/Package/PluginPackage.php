@@ -31,7 +31,10 @@ final class PluginPackage implements \JsonSerializable
             return null;
         }
 
-        $devDependencies = new Dependencies($first['require-dev'] ?? []);
+        $require = $first['require'] ?? [];
+        $requireDev = $first['require-dev'] ?? [];
+
+        $dependencies = new Dependencies($require + $requireDev);
 
         return new static([
                 'name' =>$package['name'],
@@ -42,7 +45,7 @@ final class PluginPackage implements \JsonSerializable
                 'favers' => $package['favers'] ?? 0,
                 'handle' => $first['extra']['handle'],
                 'version' => $first['version'],
-                'testLibrary' => $devDependencies->getTestPackage(),
+                'testLibrary' => $dependencies->getTestPackage(),
                 'updated' => new \DateTime($first['time']),
             ]
         );
